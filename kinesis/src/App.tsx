@@ -3,56 +3,40 @@ import { useAppStore } from './store/useAppStore';
 import { Scene } from './components/canvas/Scene';
 
 function App() {
-  // 1. Iniciamos a Webcam e a IA
   const { videoRef } = useHandTracking();
-  
-  // 2. Lemos o estado para mostrar na UI
   const isAiReady = useAppStore((state) => state.isAiReady);
-  const cursor = useAppStore((state) => state.cursor);
 
   return (
-    <>
-      {/* === CAMADA DE VÍDEO (Escondida) === */}
+    <div className="relative w-screen h-screen bg-black overflow-hidden">
+      
+      {/* 1. VÍDEO (FUNDO ESPELHADO) */}
       <video 
-        ref={videoRef} 
-        className="hidden" // Classe do Tailwind para display: none
+        ref={videoRef}
+        className="absolute top-0 left-0 w-full h-full object-cover"
+        style={{ 
+          transform: "scaleX(-1)", 
+          opacity: isAiReady ? 1 : 0,
+          transition: "opacity 1s ease-in-out"
+        }}
         playsInline 
-        muted // Importante para autoplay funcionar em alguns browsers
+        muted 
       />
 
-      {/* === CAMADA DE UI (HUD) === */}
-      <div id="ui-layer" className="flex flex-col justify-between p-8 text-neon-blue font-mono select-none">
-        
-        {/* Cabeçalho */}
-        <header className="flex justify-between items-start">
-          <div>
-            <h1 className="text-4xl font-bold tracking-widest drop-shadow-[0_0_10px_rgba(0,243,255,0.5)]">
-              KINESIS
-            </h1>
-            <p className="text-xs opacity-70">GESTURE INTERFACE v1.0</p>
-          </div>
-          
-          {/* Status do Sistema */}
-          <div className="text-right">
-            <div className={`text-sm ${isAiReady ? 'text-green-400' : 'text-red-500 animate-pulse'}`}>
-              SYSTEM: {isAiReady ? 'ONLINE' : 'INITIALIZING...'}
-            </div>
-            <div className="text-xs opacity-50 mt-1">
-              X: {cursor.x.toFixed(2)} | Y: {cursor.y.toFixed(2)}
-            </div>
-          </div>
-        </header>
-
-        {/* Rodapé com instruções */}
-        <footer className="text-center opacity-60 text-sm">
-          {!isAiReady && <p>Permita o acesso à câmera e aguarde...</p>}
-          {isAiReady && <p>Levante a mão para controlar o cursor</p>}
-        </footer>
+      {/* 2. CENA 3D (JARVIS) */}
+      <div className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none">
+        <Scene />
       </div>
 
-      {/* === CAMADA 3D === */}
-      <Scene />
-    </>
+      {/* LOADING DISCRETO (Só aparece se a IA ainda estiver carregando) */}
+      {!isAiReady && (
+        <div className="absolute inset-0 flex items-center justify-center z-50">
+          <div className="text-cyan-400 font-mono text-sm animate-pulse tracking-widest">
+            INITIALIZING JARVIS PROTOCOL...
+          </div>
+        </div>
+      )}
+      
+    </div>
   );
 }
 

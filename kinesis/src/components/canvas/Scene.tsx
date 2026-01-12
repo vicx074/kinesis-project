@@ -1,36 +1,29 @@
 import { Canvas } from '@react-three/fiber';
 import { Stars, Grid } from '@react-three/drei';
-import { Cursor } from './Cursor';
+import { JarvisHand } from './JarvisHand';
 
 export function Scene() {
   return (
-    <div id="canvas-container">
-      <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
-        
-        {/* === AMBIENTE === */}
-        <color attach="background" args={['#050505']} />
-        
-        {/* Estrelas ao fundo para dar profundidade */}
-        <Stars radius={50} count={2000} factor={4} fade speed={1} />
-        
-        {/* Grid no chão (efeito Tron/Cyberpunk) */}
-        {/* Rotacionamos para parecer um "piso" infinito */}
-        <group rotation={[Math.PI / 3, 0, 0]} position={[0, -2, -5]}>
-           <Grid 
-             args={[20, 20]} 
-             cellColor="#1a1a1a" 
-             sectionColor="#00f3ff" 
-             fadeDistance={15} 
-           />
-        </group>
+    <Canvas 
+      camera={{ position: [0, 0, 5], fov: 75 }}
+      gl={{ alpha: true }} /* <--- ISSO DEIXA O FUNDO TRANSPARENTE */
+      style={{ pointerEvents: 'none' }}
+    >
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
 
-        {/* Luz Ambiente suave */}
-        <ambientLight intensity={0.5} />
+      {/* Grid no chão */}
+      <group rotation={[Math.PI / 3, 0, 0]} position={[0, -3, -10]}>
+         <Grid 
+           args={[30, 30]} 
+           cellColor="#00f3ff" 
+           sectionColor="#ffffff" 
+           fadeDistance={20}
+         />
+      </group>
 
-        {/* === OBJETOS INTERATIVOS === */}
-        <Cursor />
-
-      </Canvas>
-    </div>
+      <Stars radius={50} count={1000} factor={3} fade speed={2} />
+      <JarvisHand />
+    </Canvas>
   );
 }
